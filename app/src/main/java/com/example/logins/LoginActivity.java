@@ -16,11 +16,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 public class LoginActivity extends AppCompatActivity {
     EditText usuario, contrasena;
-    TextView textviewRegistro;
+    TextView textviewRegistro, textviewAdmin;
     Button botoningresar;
     Connection con;
 
@@ -37,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         usuario = (EditText) findViewById(R.id.usuario);
         contrasena = (EditText) findViewById(R.id.contrasena);
         textviewRegistro = (TextView) findViewById(R.id.textviewRegistro);
+        textviewAdmin = (TextView) findViewById(R.id.textviewAdmin);
         botoningresar = (Button) findViewById(R.id.botoniniciarsesion);
 
         botoningresar.setOnClickListener(new View.OnClickListener() {
@@ -50,8 +50,15 @@ public class LoginActivity extends AppCompatActivity {
         textviewRegistro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent registro = new Intent(getApplicationContext(), Registroactivity.class);
+                Intent registro = new Intent(getApplicationContext(), RegistroActivity.class);
                 startActivity(registro);
+            }
+        });
+        textviewAdmin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent admin = new Intent(getApplicationContext(), LoginAdminActivity.class);
+                startActivity(admin);
             }
         });
     }
@@ -79,38 +86,48 @@ public class LoginActivity extends AppCompatActivity {
                 z = "No hay conexión";
             } else {
                 try {
-                    // Se usa PreparedStatement para evitar SQL Injection
-                    String sql = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
-                    PreparedStatement pst = con.prepareStatement(sql);
-                    pst.setString(1, usuario.getText().toString());
-                    pst.setString(2, contrasena.getText().toString());
+                    String usuarioInput = usuario.getText().toString().trim();
+                    String contrasenaInput = contrasena.getText().toString().trim();
 
+                    // 1. Verificar si el usuario existe
+                    String checkUserSql = "SELECT contrasena FROM usuarios WHERE usuario = ?";
+                    PreparedStatement pst = con.prepareStatement(checkUserSql);
+                    pst.setString(1, usuarioInput);
                     ResultSet rs = pst.executeQuery();
 
-                    if (rs.next()) {
+                    if (!rs.next()) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(LoginActivity.this, "Acceso exitoso", Toast.LENGTH_SHORT).show();
-                                Intent menu = new Intent(getApplicationContext(), MainActivity.class);
-                                startActivity(menu);
+                                Toast.makeText(LoginActivity.this, "El usuario no existe", Toast.LENGTH_SHORT).show();
                             }
                         });
-
-                        usuario.setText("");
-                        contrasena.setText("");
-                        exito = true;
                     } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(LoginActivity.this, "Error en la contraseña o usuario", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        usuario.setText("");
-                        contrasena.setText("");
+                        // 2. Verificar si la contraseña coincide
+                        String contrasenaCorrecta = rs.getString("contrasena");
+                        if (!contrasenaCorrecta.equals(contrasenaInput)) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(LoginActivity.this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(LoginActivity.this, "Acceso exitoso", Toast.LENGTH_SHORT).show();
+                                    Intent menu = new Intent(getApplicationContext(), MainActivity.class);
+                                    startActivity(menu);
+                                }
+                            });
+                            exito = true;
+                        }
                     }
+
+                    usuario.setText("");
+                    contrasena.setText("");
+
                 } catch (Exception e) {
                     exito = false;
                     Log.e("Error de conexión", e.getMessage());

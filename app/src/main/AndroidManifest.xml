@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -14,8 +15,11 @@
         android:theme="@style/Theme.Logins"
         tools:targetApi="31">
         <activity
-            android:name=".Registroactivity"
-            android:exported="false" />
+            android:name=".LoginAdminActivity"
+            android:exported="true" />
+        <activity
+            android:name=".RegistroActivity"
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />

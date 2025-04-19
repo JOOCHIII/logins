@@ -48,6 +48,7 @@
         android:drawableLeft="@drawable/persona"
         android:hint="Usuario"
         android:drawablePadding="10dp"
+        android:padding="8dp"
         android:textStyle="bold"
         android:ems="10"
         android:inputType="text"
@@ -62,6 +63,7 @@
         android:drawableLeft="@drawable/candado"
         android:hint="Contraseña"
         android:drawablePadding="10dp"
+        android:padding="8dp"
         android:textStyle="bold"
         android:ems="10"
         android:inputType="textPassword"
@@ -110,6 +112,19 @@
         android:textStyle="bold"
         android:layout_marginTop="5dp"
         />
+    <TextView
+        android:id="@+id/textviewAdmin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Acceder como administrador"
+        android:textAlignment="center"
+        android:textColor="#D930CF"
+        android:textColorLink="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="5dp"
+        />
+
 
 
 </LinearLayout>

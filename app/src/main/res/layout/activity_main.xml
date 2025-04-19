@@ -8,11 +8,14 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="hola mundo"
-        tools:layout_editor_absoluteX="188dp"
-        tools:layout_editor_absoluteY="325dp"
-        tools:ignore="MissingConstraints" />
+        android:layout_width="205dp"
+        android:layout_height="118dp"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="90dp"
+        tools:layout_editor_absoluteY="103dp"
+        android:text="hola mundo">
+
+    </TextView>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
