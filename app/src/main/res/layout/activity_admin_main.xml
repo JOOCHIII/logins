@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:title="Mi App"
+            app:title="ADMIN"
             app:titleTextColor="@android:color/white"
             app:popupTheme="@style/ThemeOverlay.Material3.Light"/>
 
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/menu_navigation"
+        app:menu="@menu/menu_navigation_admin"
         app:headerLayout="@layout/header_navigation"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
