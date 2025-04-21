@@ -1,5 +1,6 @@
 package com.example.logins;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -22,14 +23,16 @@ public class MainActivityAdmin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_main); // puedes usar otro layout si quieres
+        setContentView(R.layout.activity_admin_main);  // Asegúrate de que este layout existe
 
+        // Referencias
         drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.navigation_view);
+        navigationView = findViewById(R.id.navigation_view_admin);
         toolbar = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
 
+        // Toggle para abrir/cerrar el drawer desde el toolbar
         toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open,
@@ -39,18 +42,15 @@ public class MainActivityAdmin extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Cargar menú admin en vez del normal
-        navigationView.getMenu().clear(); // limpiar primero
-        navigationView.inflateMenu(R.menu.menu_navigation_admin); // inflar el menú admin
-
-        // Fragment por defecto al iniciar
+        // Fragment por defecto
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_frame, new HomeFragment()) // o un fragment admin si quieres
+                    .replace(R.id.content_frame, new home_admin())
                     .commit();
             navigationView.setCheckedItem(R.id.nav_home_admin);
         }
 
+        // Navegación de opciones del menú
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -58,18 +58,20 @@ public class MainActivityAdmin extends AppCompatActivity {
 
                 if (id == R.id.nav_home_admin) {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_frame, new HomeFragment())
+                            .replace(R.id.content_frame, new home_admin())
                             .commit();
                 } else if (id == R.id.nav_usuarios_admin) {
-                    // Fragment o Activity para gestionar usuarios
                     Toast.makeText(MainActivityAdmin.this, "Gestión de usuarios", Toast.LENGTH_SHORT).show();
+                    // Aquí puedes lanzar otro fragment o activity si quieres
                 } else if (id == R.id.nav_settings_admin) {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_frame, new SettingsFragment())
+                            .replace(R.id.content_frame, new SettingsFragment_admin())
                             .commit();
                 } else if (id == R.id.nav_logout_admin) {
-                    Toast.makeText(MainActivityAdmin.this, "Cerrando sesión de administrador...", Toast.LENGTH_SHORT).show();
-                    finish(); // o volver a LoginAdminActivity
+                    Toast.makeText(MainActivityAdmin.this, "Cerrando sesión...", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivityAdmin.this, LoginAdminActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
 
                 drawerLayout.closeDrawers();

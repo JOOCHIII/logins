@@ -1,4 +1,5 @@
 package com.example.logins;
+import com.example.logins.MainActivityAdmin;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -87,8 +88,8 @@ public class LoginAdminActivity extends AppCompatActivity {
                 return;
             }
 
-            Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(LoginAdminActivity.this, MainActivity.class);
+            Toast.makeText(this, "Inicio de sesión exitoso como administrador", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginAdminActivity.this, MainActivityAdmin.class);
             startActivity(intent);
             finish();
 

@@ -7,7 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
 public class ConnectionDB {
-    private String ip = "192.168.0.15";
+    private String ip = "192.168.1.152";
     private String basedatos = "tfg";
     private String usuario = "sa";
     private String password = "1234";
