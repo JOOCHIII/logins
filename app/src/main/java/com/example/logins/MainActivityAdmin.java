@@ -45,7 +45,7 @@ public class MainActivityAdmin extends AppCompatActivity {
         // Fragment por defecto
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_frame, new home_admin())
+                    .replace(R.id.content_frame, new home_fragment_admin())
                     .commit();
             navigationView.setCheckedItem(R.id.nav_home_admin);
         }
@@ -58,7 +58,7 @@ public class MainActivityAdmin extends AppCompatActivity {
 
                 if (id == R.id.nav_home_admin) {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_frame, new home_admin())
+                            .replace(R.id.content_frame, new home_fragment_admin())
                             .commit();
                 } else if (id == R.id.nav_usuarios_admin) {
                     Toast.makeText(MainActivityAdmin.this, "Gestión de usuarios", Toast.LENGTH_SHORT).show();

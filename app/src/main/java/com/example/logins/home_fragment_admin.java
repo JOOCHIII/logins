@@ -9,9 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class home_admin extends Fragment {
+public class home_fragment_admin extends Fragment {
 
-    public home_admin() {
+    public home_fragment_admin() {
     }
 
     @Override
