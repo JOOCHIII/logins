@@ -2,6 +2,8 @@ package com.example.logins;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private MaterialToolbar toolbar;
     private ActionBarDrawerToggle toggle;
+    private TextView textoBienvenida;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                             .commit();
                 } else if (id == R.id.nav_profile) {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_frame, new ProfileFragment())
+                            .replace(R.id.content_frame, new Fragment_profile())
                             .commit();
                 } else if (id == R.id.nav_settings) {
                     getSupportFragmentManager().beginTransaction()
@@ -66,12 +69,26 @@ public class MainActivity extends AppCompatActivity {
                             .commit();
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(MainActivity.this, "Cerrando sesión...", Toast.LENGTH_SHORT).show();
-                    finish(); // O enviar al login
+                    finish();
                 }
 
                 drawerLayout.closeDrawers();
                 return true;
             }
         });
+
+        // Mostrar nombre de usuario en el header
+        View headerView = navigationView.getHeaderView(0);
+        textoBienvenida = headerView.findViewById(R.id.textoBienvenida);
+
+
+
+
+        String nombreUsuario = getIntent().getStringExtra("nombre_usuario");
+        if (nombreUsuario != null && !nombreUsuario.isEmpty()) {
+            textoBienvenida.setText("Bienvenido, " + nombreUsuario);
+        }
+
+
     }
 }

@@ -1,6 +1,7 @@
 package com.example.logins;
 
 import Connection.ConnectionDB;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,7 +10,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -113,6 +116,7 @@ public class LoginActivity extends AppCompatActivity {
                             public void run() {
                                 Toast.makeText(LoginActivity.this, "Acceso exitoso", Toast.LENGTH_SHORT).show();
                                 Intent menu = new Intent(getApplicationContext(), MainActivity.class);
+                                menu.putExtra("nombre_usuario", usuarioInput);
                                 startActivity(menu);
                             }
                         });

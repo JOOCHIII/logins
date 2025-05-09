@@ -89,8 +89,10 @@ public class LoginAdminActivity extends AppCompatActivity {
             }
 
             Toast.makeText(this, "Inicio de sesión exitoso como administrador", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(LoginAdminActivity.this, MainActivityAdmin.class);
+            Intent intent = new Intent(getApplicationContext(), MainActivityAdmin.class);
+            intent.putExtra("nombre_Admin", usuario);
             startActivity(intent);
+
             finish();
 
         } catch (Exception e) {

@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
 
         <item
             android:id="@+id/nav_home_admin"
             android:title="Inicio"
             android:icon="@drawable/baseline_home_24" />
-
+        <item
+            android:id="@+id/mi_perfil"
+            android:title="Mi perfil"
+            android:icon="@drawable/persona" />
         <item
             android:id="@+id/nav_usuarios_admin"
             android:title="Usuarios"
-            android:icon="@drawable/persona" />
+            android:icon="@drawable/baseline_people_24" />
 
         <item
             android:id="@+id/nav_settings_admin"
@@ -23,6 +25,6 @@
             android:title="Cerrar sesión"
             android:icon="@drawable/baseline_exit_to_app_24" />
 
-    </group>
+
 
 </menu>

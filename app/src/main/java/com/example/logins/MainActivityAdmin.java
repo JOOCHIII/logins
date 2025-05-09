@@ -3,6 +3,8 @@ package com.example.logins;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,9 @@ public class MainActivityAdmin extends AppCompatActivity {
     private NavigationView navigationView;
     private MaterialToolbar toolbar;
     private ActionBarDrawerToggle toggle;
+    private TextView textoBienvenida_admin;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,10 @@ public class MainActivityAdmin extends AppCompatActivity {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_frame, new SettingsFragment_admin())
                             .commit();
+                } else if (id == R.id.mi_perfil) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content_frame, new Fragment_profile_admin())
+                            .commit();
                 } else if (id == R.id.nav_logout_admin) {
                     Toast.makeText(MainActivityAdmin.this, "Cerrando sesión...", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivityAdmin.this, LoginAdminActivity.class);
@@ -78,5 +87,17 @@ public class MainActivityAdmin extends AppCompatActivity {
                 return true;
             }
         });
+        View headerView_admin = navigationView.getHeaderView(0);
+        textoBienvenida_admin = headerView_admin.findViewById(R.id.textoBienvenida_admin);
+
+        // Mostrar nombre de usuario admin en el header
+        String nombreUsuarioAdmin = getIntent().getStringExtra("nombre_Admin");
+        if (nombreUsuarioAdmin != null && !nombreUsuarioAdmin.isEmpty()) {
+            textoBienvenida_admin.setText("Bienvenido, " + nombreUsuarioAdmin);
+        }
+
+
+
+
     }
 }

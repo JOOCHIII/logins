@@ -9,7 +9,7 @@
     android:gravity="bottom">
 
     <TextView
-        android:text="Bienvenido, admin"
+        android:id="@+id/textoBienvenida_admin"
         android:textColor="@android:color/white"
         android:textSize="20sp"
         android:layout_width="wrap_content"
