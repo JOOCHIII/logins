@@ -1,6 +1,7 @@
 package com.example.logins;
 
 import Connection.ConnectionDB;
+import retrofit2.Call;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,10 +26,10 @@ public class LoginActivity extends AppCompatActivity {
     Button botoningresar;
     Connection con;
 
-    public LoginActivity() {
+ /*   public LoginActivity() {
         ConnectionDB instanceConnection = new ConnectionDB();
         con = instanceConnection.connect();
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,61 +75,46 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // Método de login, ahora reemplazado sin AsyncTask
-    public void login() {
-        if (con == null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(LoginActivity.this, "No hay conexión", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            try {
-                String usuarioInput = usuario.getText().toString().trim();
-                String contrasenaInput = contrasena.getText().toString().trim();
+    private void login() {
+        String usuarioInput = usuario.getText().toString().trim();
+        String contrasenaInput = contrasena.getText().toString().trim();
 
-                // 1. Verificar si el usuario existe
-                String checkUserSql = "SELECT contrasena FROM usuarios WHERE usuario = ?";
-                PreparedStatement pst = con.prepareStatement(checkUserSql);
-                pst.setString(1, usuarioInput);
-                ResultSet rs = pst.executeQuery();
+        UsuarioApi usuarioApi = RetrofitClient.getRetrofitInstance().create(UsuarioApi.class);
+        Call<String> call = usuarioApi.login(usuarioInput, contrasenaInput);
 
-                if (!rs.next()) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+        call.enqueue(new retrofit2.Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String resultado = response.body();
+
+                    switch (resultado) {
+                        case "ACCESO_CONCEDIDO":
+                            Toast.makeText(LoginActivity.this, "Acceso exitoso", Toast.LENGTH_SHORT).show();
+                            Intent menu = new Intent(getApplicationContext(), MainActivity.class);
+                            menu.putExtra("nombre_usuario", usuarioInput);
+                            startActivity(menu);
+                            break;
+                        case "CONTRASENA_INCORRECTA":
+                            Toast.makeText(LoginActivity.this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
+                            break;
+                        case "USUARIO_NO_EXISTE":
                             Toast.makeText(LoginActivity.this, "El usuario no existe", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    // 2. Verificar si la contraseña coincide
-                    String contrasenaCorrecta = rs.getString("contrasena");
-                    if (!contrasenaCorrecta.equals(contrasenaInput)) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(LoginActivity.this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(LoginActivity.this, "Acceso exitoso", Toast.LENGTH_SHORT).show();
-                                Intent menu = new Intent(getApplicationContext(), MainActivity.class);
-                                menu.putExtra("nombre_usuario", usuarioInput);
-                                startActivity(menu);
-                            }
-                        });
+                            break;
+                        default:
+                            Toast.makeText(LoginActivity.this, "Respuesta desconocida: " + resultado, Toast.LENGTH_SHORT).show();
+                            break;
                     }
+                } else {
+                    Toast.makeText(LoginActivity.this, "Error en la respuesta del servidor", Toast.LENGTH_SHORT).show();
                 }
-
-                usuario.setText("");
-                contrasena.setText("");
-
-            } catch (Exception e) {
-                Log.e("Error de conexión", e.getMessage());
             }
-        }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 }

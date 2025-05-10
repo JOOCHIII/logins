@@ -2,7 +2,6 @@ package com.example.logins;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,23 +10,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
-import Connection.ConnectionDB;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegistroActivity extends AppCompatActivity {
 
     EditText nombreapellidos, email, telefono, usuario, clave, confirmaclave;
     Button registrar;
     TextView ingresar;
-    Connection con;
-
-    public RegistroActivity() {
-        ConnectionDB instanceConnection = new ConnectionDB();
-        con = instanceConnection.connect();
-    }
+    UsuarioApi usuarioApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +35,12 @@ public class RegistroActivity extends AppCompatActivity {
         registrar = findViewById(R.id.btnregistrar);
         ingresar = findViewById(R.id.lbliniciarsesion);
 
+        usuarioApi = RetrofitClient.getRetrofitInstance().create(UsuarioApi.class);
+
         registrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                registrar(view);
+                registrarUsuario();
             }
         });
 
@@ -60,118 +54,63 @@ public class RegistroActivity extends AppCompatActivity {
         });
     }
 
-    public void registrar(View view) {
-        try {
-            // Comprobar si el correo tiene un '@'
-            String correoInput = email.getText().toString();
-            if (!correoInput.contains("@")) {
-                Toast.makeText(RegistroActivity.this, "El correo debe contener @", Toast.LENGTH_SHORT).show();
-                return;
+    private void registrarUsuario() {
+        // Validar correo
+        String correoInput = email.getText().toString();
+        if (!correoInput.contains("@")) {
+            Toast.makeText(this, "El correo debe contener @", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validar contraseñas
+        String password = clave.getText().toString();
+        String confirmPassword = confirmaclave.getText().toString();
+        if (!password.equals(confirmPassword)) {
+            Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Llamada a la API usando Retrofit
+        Call<String> call = usuarioApi.registrarUsuario(
+                nombreapellidos.getText().toString(),
+                email.getText().toString(),
+                telefono.getText().toString(),
+                usuario.getText().toString(),
+                clave.getText().toString()
+        );
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    String mensaje = response.body();
+                    Toast.makeText(RegistroActivity.this, mensaje, Toast.LENGTH_SHORT).show();
+
+                    if ("Usuario registrado correctamente".equals(mensaje)) {
+                        limpiarCampos();
+                        // Opcional: volver al login o a otra pantalla
+                        // Intent intent = new Intent(RegistroActivity.this, LoginActivity.class);
+                        // startActivity(intent);
+                        // finish();
+                    }
+                } else {
+                    Toast.makeText(RegistroActivity.this, "Error en el servidor", Toast.LENGTH_SHORT).show();
+                }
             }
 
-            // Comprobar que las contraseñas coinciden
-            String password = clave.getText().toString();
-            String confirmPassword = confirmaclave.getText().toString();
-
-            if (!password.equals(confirmPassword)) {
-                Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
-                return;
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(RegistroActivity.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
-            // Verificar que no se repita el nombre de usuario, correo o teléfono
-            String consulta = "SELECT COUNT(*) FROM usuarios WHERE usuario = ? OR correo = ? OR telefono = ?";
-            PreparedStatement pst = con.prepareStatement(consulta);
-            pst.setString(1, usuario.getText().toString());
-            pst.setString(2, email.getText().toString());
-            pst.setString(3, telefono.getText().toString());
-
-            ResultSet rs = pst.executeQuery();
-            rs.next();
-            int count = rs.getInt(1);
-
-            if (count > 0) {
-                // Si el usuario está repetido
-                if (isUsuarioRepetido()) {
-                    Toast.makeText(this, "El usuario ya está registrado", Toast.LENGTH_SHORT).show();
-                }
-                // Si el correo está repetido
-                else if (isCorreoRepetido()) {
-                    Toast.makeText(this, "El correo ya está registrado", Toast.LENGTH_SHORT).show();
-                }
-                // Si el teléfono está repetido
-                else if (isTelefonoRepetido()) {
-                    Toast.makeText(this, "El teléfono ya está registrado", Toast.LENGTH_SHORT).show();
-                }
-                return;
-            }
-
-            // Insertar nuevo usuario si todo es válido
-            PreparedStatement stm = con.prepareStatement("INSERT INTO usuarios (nombrecompleto, correo, telefono, usuario, contrasena) VALUES(?,?,?,?,?)");
-            stm.setString(1, nombreapellidos.getText().toString());
-            stm.setString(2, email.getText().toString());
-            stm.setString(3, telefono.getText().toString());
-            stm.setString(4, usuario.getText().toString());
-            stm.setString(5, clave.getText().toString());
-
-            stm.executeUpdate();
-
-            Toast.makeText(RegistroActivity.this, "Cliente agregado correctamente", Toast.LENGTH_SHORT).show();
-
-            // Limpiar campos después del registro
-            nombreapellidos.setText("");
-            email.setText("");
-            telefono.setText("");
-            usuario.setText("");
-            clave.setText("");
-            confirmaclave.setText("");
-
-        } catch (Exception e) {
-            Log.e("Error de conexion", e.getMessage());
-        }
+        });
     }
 
-    // Verificar si el usuario ya existe
-    private boolean isUsuarioRepetido() {
-        try {
-            String usuarioInput = usuario.getText().toString();
-            String consulta = "SELECT COUNT(*) FROM usuarios WHERE usuario = ?";
-            PreparedStatement pst = con.prepareStatement(consulta);
-            pst.setString(1, usuarioInput);
-            ResultSet rs = pst.executeQuery();
-            rs.next();
-            return rs.getInt(1) > 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // Verificar si el correo ya existe
-    private boolean isCorreoRepetido() {
-        try {
-            String correoInput = email.getText().toString();
-            String consulta = "SELECT COUNT(*) FROM usuarios WHERE correo = ?";
-            PreparedStatement pst = con.prepareStatement(consulta);
-            pst.setString(1, correoInput);
-            ResultSet rs = pst.executeQuery();
-            rs.next();
-            return rs.getInt(1) > 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // Verificar si el teléfono ya existe
-    private boolean isTelefonoRepetido() {
-        try {
-            String telefonoInput = telefono.getText().toString();
-            String consulta = "SELECT COUNT(*) FROM usuarios WHERE telefono = ?";
-            PreparedStatement pst = con.prepareStatement(consulta);
-            pst.setString(1, telefonoInput);
-            ResultSet rs = pst.executeQuery();
-            rs.next();
-            return rs.getInt(1) > 0;
-        } catch (Exception e) {
-            return false;
-        }
+    private void limpiarCampos() {
+        nombreapellidos.setText("");
+        email.setText("");
+        telefono.setText("");
+        usuario.setText("");
+        clave.setText("");
+        confirmaclave.setText("");
     }
 }
