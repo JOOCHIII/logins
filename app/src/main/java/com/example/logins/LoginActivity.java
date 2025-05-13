@@ -2,6 +2,8 @@ package com.example.logins;
 
 import Connection.ConnectionDB;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -76,31 +78,45 @@ public class LoginActivity extends AppCompatActivity {
 
     // Método de login, ahora reemplazado sin AsyncTask
     private void login() {
+        // Obtener valores introducidos por el usuario
         String usuarioInput = usuario.getText().toString().trim();
         String contrasenaInput = contrasena.getText().toString().trim();
+        String origenApp = "tienda";  // Definir el origen de la app
 
+        // Crear instancia de la API
         UsuarioApi usuarioApi = RetrofitClient.getRetrofitInstance().create(UsuarioApi.class);
-        Call<String> call = usuarioApi.login(usuarioInput, contrasenaInput);
 
-        call.enqueue(new retrofit2.Callback<String>() {
+        // Llamada a la API para hacer login
+        Call<String> call = usuarioApi.login(usuarioInput, contrasenaInput, origenApp);
+
+        // Ejecutar la llamada de forma asíncrona
+        call.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
+            public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String resultado = response.body();
 
+                    // Evaluar la respuesta del servidor
                     switch (resultado) {
                         case "ACCESO_CONCEDIDO":
                             Toast.makeText(LoginActivity.this, "Acceso exitoso", Toast.LENGTH_SHORT).show();
-                            Intent menu = new Intent(getApplicationContext(), MainActivity.class);
-                            menu.putExtra("nombre_usuario", usuarioInput);
-                            startActivity(menu);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("nombre_usuario", usuarioInput);
+                            startActivity(intent);
                             break;
+
                         case "CONTRASENA_INCORRECTA":
                             Toast.makeText(LoginActivity.this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
                             break;
+
                         case "USUARIO_NO_EXISTE":
                             Toast.makeText(LoginActivity.this, "El usuario no existe", Toast.LENGTH_SHORT).show();
                             break;
+
+                        case "ACCESO_DENEGADO_ORIGEN_APP":
+                            Toast.makeText(LoginActivity.this, "Acceso denegado desde esta app", Toast.LENGTH_SHORT).show();
+                            break;
+
                         default:
                             Toast.makeText(LoginActivity.this, "Respuesta desconocida: " + resultado, Toast.LENGTH_SHORT).show();
                             break;
@@ -112,9 +128,17 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
+    protected void onResume() {
+        super.onResume();
+
+        // Limpiar los campos al volver al login
+        usuario.setText("");
+        contrasena.setText("");
+    }
+
 
 }

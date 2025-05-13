@@ -55,8 +55,7 @@ public class RegistroActivity extends AppCompatActivity {
     }
 
     private void registrarUsuario() {
-        // Validar correo
-        String correoInput = email.getText().toString();
+        String correoInput = email.getText().toString().trim();
         if (!correoInput.contains("@")) {
             Toast.makeText(this, "El correo debe contener @", Toast.LENGTH_SHORT).show();
             return;
@@ -70,15 +69,20 @@ public class RegistroActivity extends AppCompatActivity {
             return;
         }
 
-        // Llamada a la API usando Retrofit
+        // Definir el origen de la app
+        String origenApp = "tienda";
+
+        // Llamar a la API para registrar el usuario
         Call<String> call = usuarioApi.registrarUsuario(
-                nombreapellidos.getText().toString(),
-                email.getText().toString(),
-                telefono.getText().toString(),
-                usuario.getText().toString(),
-                clave.getText().toString()
+                nombreapellidos.getText().toString().trim(),
+                correoInput,
+                telefono.getText().toString().trim(),
+                usuario.getText().toString().trim(),
+                password,
+                origenApp
         );
 
+        // Ejecutar la llamada de forma asíncrona
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -88,10 +92,6 @@ public class RegistroActivity extends AppCompatActivity {
 
                     if ("Usuario registrado correctamente".equals(mensaje)) {
                         limpiarCampos();
-                        // Opcional: volver al login o a otra pantalla
-                        // Intent intent = new Intent(RegistroActivity.this, LoginActivity.class);
-                        // startActivity(intent);
-                        // finish();
                     }
                 } else {
                     Toast.makeText(RegistroActivity.this, "Error en el servidor", Toast.LENGTH_SHORT).show();
