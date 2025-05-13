@@ -31,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
  /*   public LoginActivity() {
         ConnectionDB instanceConnection = new ConnectionDB();
         con = instanceConnection.connect();
+        aaaa
     }*/
 
     @Override
